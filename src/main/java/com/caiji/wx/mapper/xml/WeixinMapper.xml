@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caiji.wx.mapper.WeixinMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.caiji.wx.entity.Weixin">
+		<id column="ID" property="id" />
+		<result column="BIZ" property="biz" />
+		<result column="TIME_STAMP" property="timeStamp" />
+		<result column="NAME" property="name" />
+		<result column="IMG" property="img" />
+		<result column="DESC" property="desc" />
+	</resultMap>
+
+</mapper>

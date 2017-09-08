@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caiji.weibo.mapper.WbuserMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.caiji.weibo.entity.Wbuser">
+		<id column="ID" property="id" />
+		<result column="WEIBONAME" property="weiboname" />
+		<result column="COMMENT" property="comment" />
+		<result column="FANS_NUM" property="fansNum" />
+		<result column="GUANZHU_NUM" property="guanzhuNum" />
+		<result column="WB_NUM" property="wbNum" />
+		<result column="CRAWLEVEL" property="crawlevel" />
+	</resultMap>
+
+</mapper>

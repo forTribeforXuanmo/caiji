@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caiji.weibo.mapper.WbcommentMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.caiji.weibo.entity.Wbcomment">
+		<id column="ID" property="id" />
+		<result column="USERNAME" property="username" />
+		<result column="TIME" property="time" />
+		<result column="DZNUM" property="dznum" />
+		<result column="CONTENT" property="content" />
+		<result column="WBPOST_URL" property="wbpostUrl" />
+	</resultMap>
+
+</mapper>

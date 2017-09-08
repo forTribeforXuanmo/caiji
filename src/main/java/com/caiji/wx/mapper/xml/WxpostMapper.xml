@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caiji.wx.mapper.WxpostMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.caiji.wx.entity.Wxpost">
+		<id column="ID" property="id" />
+		<result column="BIZ" property="biz" />
+		<result column="FIELD_ID" property="fieldId" />
+		<result column="TITLE" property="title" />
+		<result column="TITLE_ENCODE" property="titleEncode" />
+		<result column="DIGEST" property="digest" />
+		<result column="CONTENT_URL" property="contentUrl" />
+		<result column="SOURCE_URL" property="sourceUrl" />
+		<result column="COVER" property="cover" />
+		<result column="IS_MULTI" property="isMulti" />
+		<result column="IS_TOP" property="isTop" />
+		<result column="DATETIME" property="datetime" />
+		<result column="READNUM" property="readnum" />
+		<result column="LIKENUM" property="likenum" />
+		<result column="SN" property="sn" />
+	</resultMap>
+	<select id="selectPostByContentUrl" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT * FROM wxpost WHERE CONTENT_URL=#{contentUrl}
+	</select>
+
+	<update id="updateNum" >
+		UPDATE wxpost SET READNUM=#{readNum} ,LIKENUM=#{likeNum} WHERE BIZ=#{biz} AND SN=#{sn}
+	</update>
+	<select id="selectContentUrlList" parameterType="java.lang.String" resultType="java.lang.String" >
+		SELECT CONTENT_URL FROM wxpost WHERE BIZ=#{biz}
+	</select>
+</mapper>
