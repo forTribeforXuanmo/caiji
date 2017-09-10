@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.NamedNodeMap;
 
+import javax.sound.midi.Soundbank;
 import javax.swing.text.html.HTML;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -60,13 +61,36 @@ public class Handler {
         Handler handler = new Handler();
         WebClient client = handler.getClient();
         handler.login(client);
-        String name="林允儿";
+        String name="轩墨宝宝QAQ";
         HtmlPage userWeibo = handler.search(name, client);
         logger.info("微博首页第一页" + userWeibo.asXml());
-        handler.weiboToDB(userWeibo,name);
+        handler.readOneWholeWeibo(userWeibo,name,1);
         long e = System.currentTimeMillis() / 1000;
         logger.info("一共花了  ：" + (e - s));
     }
+    public void readOneWholeWeibo(HtmlPage indexPage,String name,int pageNo) throws ParseException, InterruptedException, IOException {
+        logger.info("第"+pageNo+"页");
+        boolean shouldGetNextPage =weiboToDB(indexPage, name,pageNo);
+        if(shouldGetNextPage){
+            HtmlAnchor nextPage = indexPage.getAnchorByText("下页");
+            if(nextPage!=null){
+                indexPage = nextPage.click();
+                Thread.sleep(1000);
+                readOneWholeWeibo(indexPage,name,pageNo++);
+            }else {
+                //结束
+                return;
+            }
+        }else {
+            //结束
+            return;
+        }
+    }
+
+
+
+
+
 
     /**
      * 登录
@@ -117,7 +141,7 @@ public class Handler {
      * @throws InterruptedException
      * @throws ParseException
      */
-    public void weiboToDB(HtmlPage page,String weiboName) throws InterruptedException, ParseException {
+    public boolean weiboToDB(HtmlPage page,String weiboName,int pageNo) throws InterruptedException, ParseException {
         boolean shouldGetNextPage=true;
         Date nowLine = new Date();
         int count=0;
@@ -140,34 +164,40 @@ public class Handler {
                 String time = spans.get(1).asText();
                 logger.info("时间span打印" + time);
                 finallyTime = time.substring(0, time.indexOf("来自"));
-                zan = div.querySelector("a[href*='/attitude/']").asText();
-                zan = zan.substring(2, zan.length() - 2);
-                zhuanfa = div.querySelector("a[href*='/repost/']").asText();
-                zhuanfa = zhuanfa.substring(3, zhuanfa.length() - 2);
-                pinglun = div.querySelector("a[href*='/comment/']").asText();
-                pinglun = pinglun.substring(3, pinglun.length() - 2);
-                url = div.querySelector("a[href*='/comment/']").getAttributes().getNamedItem("href").getNodeValue();
+                zan = div.querySelector("a[href*='https://weibo.cn/attitude/']").asText();
+                zan = zan.substring(2, zan.length() - 1);
+                zhuanfa = div.querySelector("a[href*='https://weibo.cn/repost/']").asText();
+                zhuanfa = zhuanfa.substring(3, zhuanfa.length() - 1);
+                pinglun = div.querySelector("a[href*='https://weibo.cn/comment/']").asText();
+                pinglun = pinglun.substring(3, pinglun.length() - 1);
+                url = div.querySelector("a[href*='https://weibo.cn/comment/']").getAttributes().getNamedItem("href").getNodeValue();
                 logger.info("id=" + id + "time" + time + "zan" + zan + "zhuanfa" + zhuanfa + "pinglun" + pinglun + " url" + url);
-                logger.info("内容" + content);
-            } else {
+            } else  {
+
                 DomNode div1 = divs.get(0);
                 DomNode div2 = divs.get(1);
+                if(divs.size()==3){
+                    div2=divs.get(2);
+                }
                 content = div1.asXml();
-                zan = div2.querySelector("a[href*='/attitude/']").asText();
-                zan = zan.substring(2, zan.length() - 2);
-                zhuanfa = div2.querySelector("a[href*='/repost/']").asText();
-                zhuanfa = zhuanfa.substring(3, zhuanfa.length() - 2);
-                pinglun = div2.querySelector("a[href*='/comment/']").asText();
-                pinglun = pinglun.substring(3, pinglun.length() - 2);
-                url = div2.querySelector("a[href*='/comment/']").getAttributes().getNamedItem("href").getNodeValue();
+                zan = div2.querySelector("a[href*='https://weibo.cn/attitude/']").asText();
+                zan = zan.substring(2, zan.length() - 1);
+                zhuanfa = div2.querySelector("a[href*='https://weibo.cn/repost/']").asText();
+                zhuanfa = zhuanfa.substring(3, zhuanfa.length() - 1);
+                pinglun = div2.querySelector("a[href*='https://weibo.cn/comment/']").asText();
+                pinglun = pinglun.substring(3, pinglun.length() - 1);
+                url = div2.querySelector("a[href*='https://weibo.cn/comment/']").getAttributes().getNamedItem("href").getNodeValue();
                 String time = div2.querySelector("span").asText();
+                if(divs.size()==3){
+                    time=div2.querySelectorAll("span").get(1).asText();
+                }
+                System.out.println("time"+time);
                 finallyTime = time.substring(0, time.indexOf("来自"));
                 logger.info("id=" + id + "time" + time + "zan" + zan + "zhuanfa" + zhuanfa + "pinglun" + pinglun + " url" + url);
-                logger.info("内容" + content);
             }
             finallyTime=converseTime(finallyTime,nowLine);
-            logger.info("时间"+finallyTime);
-            if(DateUtils.addDays(nowLine,-31).getTime()>DateUtils.parseDate(finallyTime,pattern).getTime()){
+            //logger.info("时间"+finallyTime);
+            if(DateUtils.addDays(nowLine,-31).getTime()<=DateUtils.parseDate(finallyTime,pattern).getTime()){
                 //存入数据库
                 Wbpost wbpost=new Wbpost();
                 wbpost.setId(id);
@@ -178,20 +208,17 @@ public class Handler {
                 wbpost.setTime(finallyTime);
                 wbpost.setWeiboname(weiboName);
                 wbpost.setUrl(url);
-                wbpost.insert();
-
+               // wbpost.insert();
+                logger.info(wbpost.toString());
             }else {
-                if(count!=1){
+                if(count!=1&&pageNo!=1){
                     shouldGetNextPage=false;  //时间不对不翻页了，并且不是置顶的
                 }
             }
         }
-
+        return shouldGetNextPage;
     }
 
-    public void writeWbToDB(DomNodeList<DomNode>weibos ){
-
-    }
 
 
 
