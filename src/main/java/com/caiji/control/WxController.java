@@ -91,14 +91,12 @@ public class WxController {
 
     }
 
-
     public synchronized String getMsgJson(HttpServletRequest request) throws UnsupportedEncodingException {
 
         String str = StringEscapeUtils.unescapeHtml(StringEscapeUtils.unescapeHtml(URLDecoder.decode(request.getParameter("str"), "utf-8")));
         String url = URLDecoder.decode(request.getParameter("url"));
         String respData = request.getParameter("respData");
         logger.info(url);
-//        logger.info("\n下面为文章列表json信息");
         logger.info(str);
         Map mapUrl = handleUrl(url);
         logger.info("url map:\n");

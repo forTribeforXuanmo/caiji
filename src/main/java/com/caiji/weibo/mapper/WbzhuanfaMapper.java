@@ -1,6 +1,6 @@
 package com.caiji.weibo.mapper;
 
-import com.caiji.weibo.entity.Wbcomment;
+import com.caiji.weibo.entity.Wbzhuanfa;
 import com.baomidou.mybatisplus.mapper.BaseMapper;
 
 /**
@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.mapper.BaseMapper;
  * </p>
  *
  * @author lsz
- * @since 2017-09-13
+ * @since 2017-09-12
  */
-public interface WbcommentMapper extends BaseMapper<Wbcomment> {
+public interface WbzhuanfaMapper extends BaseMapper<Wbzhuanfa> {
 
 }

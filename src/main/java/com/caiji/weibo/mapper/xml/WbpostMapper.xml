@@ -11,7 +11,8 @@
 		<result column="PINGLUN_NUM" property="pinglunNum" />
 		<result column="DIANZAN_NUM" property="dianzanNum" />
 		<result column="URL" property="url" />
-		<result column="WEIBONAME" property="weiboname" />
+		<result column="WBUSERTABLE_ID" property="wbUserTableId" />
+		<result column="ZHUANFA_URL" property="zhaunfaUrl" />
 	</resultMap>
 
 </mapper>

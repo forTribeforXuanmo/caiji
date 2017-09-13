@@ -1,3 +1,4 @@
+/*
 package com.caiji.weibo;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -20,9 +21,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+*/
 /**
  * Created by Administrator on 2017-9-6.
- */
+ *//*
+
 public class SeleniumHandler {
 
     private static String currentYear = null;
@@ -39,14 +42,16 @@ public class SeleniumHandler {
         getWeibo(driver);
     }
 
-    /**
+    */
+/**
      * 获取微博
      *
      * @param driver
      * @return 返回微博文章集合
      * @throws ParseException
      * @throws InterruptedException
-     */
+     *//*
+
     public static List<WebElement> getWeibo(WebDriver driver) throws ParseException, InterruptedException {
         List<WebElement> elements = driver.findElements(By.cssSelector("div[id^='M_']"));
         int  size=elements.size();
@@ -87,14 +92,16 @@ public class SeleniumHandler {
     }
 
 
-    /**
+    */
+/**
      * 点击评论标签进入 获取评论
      *
      * @param driver
      * @param member 一个微博文章的WebElement
      * @return
      * @throws InterruptedException
-     */
+     *//*
+
     public static List<WebElement> getComment(WebDriver driver, WebElement member) throws InterruptedException, ParseException {
         String time = member.findElement(By.className("time")).getText();
         List<WebElement> commentList = null;
@@ -166,18 +173,21 @@ public class SeleniumHandler {
     }
 
 
-    /**
+    */
+/**
      * 获取WebDriver
      *
      * @return
-     */
+     *//*
+
     public static WebDriver getDriver() {
         System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\Google\\Chrome\\Application\\chromedriver.exe");
         WebDriver driver = new ChromeDriver();
         return driver;
     }
 
-    /**
+    */
+/**
      * JS控制滚动条的位置：
      * <p>
      * window.scrollTo(x,y);
@@ -195,19 +205,22 @@ public class SeleniumHandler {
      * 窗口滚动条滑倒底部
      *
      * @param driver
-     */
+     *//*
+
     public static void scrollToFoot(WebDriver driver) {
         JavascriptExecutor driver_js = (JavascriptExecutor) driver;
         driver_js.executeScript("window.scrollTo(0,document.body.scrollHeight)");
     }
 
 
-    /**
+    */
+/**
      * 操作 读取微博集合
      *
      * @param weiboList
      * @param weiboName 微博名
-     */
+     *//*
+
     public static void readWeibo(List<WebElement> weiboList, String weiboName) throws ParseException {
         int number = 0;
         for (WebElement element : weiboList) {
@@ -237,12 +250,14 @@ public class SeleniumHandler {
     }
 
 
-    /**
+    */
+/**
      * 登录微博
      *
      * @param driver
      * @return
-     */
+     *//*
+
     public static WebDriver login(WebDriver driver, String userName, String password) {
         driver.get("https://passport.weibo.cn/signin/login?entry=mweibo&r=http%3A%2F%2Fweibo.cn%2F%3Ffeaturecode%3D20000320%26luicode%3D10000011%26lfid%3D100103type%253D1%2526q%253DEMINEM%25E4%25B8%25AD%25E6%2596%2587%25E7%25BD%2591%25E5%25AE%2598%25E6%2596%25B9%25E5%25BE%25AE%25E5%258D%259A&backTitle=%CE%A2%B2%A9&vt=");
         try {
@@ -251,11 +266,14 @@ public class SeleniumHandler {
             e.printStackTrace();
         }
 
-        WebElement login = driver.findElement(By.xpath("//*[@id=\"loginName\"]"));
+        WebElement login = driver.findElement(By.xpath("/*/
+/*[@id=\"loginName\"]"));
         login.click();
         login.sendKeys(userName);
-        driver.findElement(By.xpath("//*[@id=\"loginPassword\"]")).sendKeys(password);
-        driver.findElement(By.xpath("//*[@id=\"loginAction\"]")).click();
+        driver.findElement(By.xpath("/*/
+/*[@id=\"loginPassword\"]")).sendKeys(password);
+        driver.findElement(By.xpath("/*/
+/*[@id=\"loginAction\"]")).click();
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
@@ -264,12 +282,14 @@ public class SeleniumHandler {
         return driver;
     }
 
-    /**
+    */
+/**
      * 首页中点击搜索
      *
      * @param driver
      * @throws InterruptedException
-     */
+     *//*
+
     public static void clickSearch(WebDriver driver) throws InterruptedException {
         WebDriverWait wait = new WebDriverWait(driver, 10);
         WebElement e = (new WebDriverWait(driver, 10)).until(
@@ -290,14 +310,16 @@ public class SeleniumHandler {
     }
 
 
-    /**
+    */
+/**
      * 查找微博号，并进入该微博号主页
      *
      * @param weiboName 微博名字
      * @param driver
      * @return 查找的真实微博名
      * @throws InterruptedException
-     */
+     *//*
+
     public static String search(String weiboName, WebDriver driver) throws InterruptedException {
         String trueWeiboName = weiboName;
         WebElement queryVal = driver.findElement(By.name("keyword"));
@@ -319,3 +341,4 @@ public class SeleniumHandler {
     }
 
 }
+*/

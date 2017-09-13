@@ -18,7 +18,7 @@ public class Wbpost extends Model<Wbpost> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 内部Id
+     * Id
      */
     @TableId("ID")
 	private String id;
@@ -48,15 +48,29 @@ public class Wbpost extends Model<Wbpost> {
 	@TableField("DIANZAN_NUM")
 	private Integer dianzanNum;
     /**
-     * url地址
+     * url评论地址
      */
 	@TableField("URL")
 	private String url;
-    /**
-     * 微博用户
+	/**
+	 * 转发地址
+	 */
+	@TableField("ZHUANFA_URL")
+	private String zhaunfaUrl;
+
+	public String getZhaunfaUrl() {
+		return zhaunfaUrl;
+	}
+
+	public void setZhaunfaUrl(String zhaunfaUrl) {
+		this.zhaunfaUrl = zhaunfaUrl;
+	}
+
+	/**
+     * 用户表id
      */
-	@TableField("WEIBONAME")
-	private String weiboname;
+	@TableField("WBUSERTABLE_ID")
+	private Integer wbUserTableId;
 
 
 	public String getId() {
@@ -115,12 +129,12 @@ public class Wbpost extends Model<Wbpost> {
 		this.url = url;
 	}
 
-	public String getWeiboname() {
-		return weiboname;
+	public Integer getWbUserTableId() {
+		return wbUserTableId;
 	}
 
-	public void setWeiboname(String weiboname) {
-		this.weiboname = weiboname;
+	public void setWbUserTableId(Integer wbUserTableId) {
+		this.wbUserTableId = wbUserTableId;
 	}
 
 	@Override
@@ -131,14 +145,14 @@ public class Wbpost extends Model<Wbpost> {
 	@Override
 	public String toString() {
 		return "Wbpost{" +
-			"id=" + id +
-			", content=" + content +
-			", time=" + time +
-			", zhuanfaNum=" + zhuanfaNum +
-			", pinglunNum=" + pinglunNum +
-			", dianzanNum=" + dianzanNum +
-			", url=" + url +
-			", weiboname=" + weiboname +
-			"}";
+				"id='" + id + '\'' +
+				", content='" + content + '\'' +
+				", time='" + time + '\'' +
+				", zhuanfaNum=" + zhuanfaNum +
+				", pinglunNum=" + pinglunNum +
+				", dianzanNum=" + dianzanNum +
+				", url='" + url + '\'' +
+				", wbUserTableId='" + wbUserTableId + '\'' +
+				'}';
 	}
 }

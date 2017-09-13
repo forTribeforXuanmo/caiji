@@ -43,7 +43,7 @@
         <property name="logAbandoned" value="true"/>
 
         <!-- 监控数据库 -->
-        <!--<property name="filters" value="mergeStat"/>-->
+        <!--<propeidname="filters" value="mergeStat"/>-->
         <property name="filters" value="stat" />
         <property name="proxyFilters">
             <list>
@@ -62,8 +62,8 @@
     </bean>
 
     <bean id="logFilter" class="com.alibaba.druid.filter.logging.Log4jFilter">
-        <!-- <property name="resultSetLogEnabled" value="false" /> -->
-        <!-- <property name="statementExecutableSqlLogEnable" value="true" /> -->
+        <!-- <propeidname="resultSetLogEnabled" value="false" /> -->
+        <!-- <propeidname="statementExecutableSqlLogEnable" value="true" /> -->
     </bean>
     <!-- 慢SQL记录  *end* -->
 	
@@ -93,9 +93,9 @@
                 <bean id="paginationInterceptor" class="com.baomidou.mybatisplus.plugins.PaginationInterceptor">
                 </bean>
                <!-- <bean class="com.baomidou.mybatisplus.plugins.PerformanceInterceptor">
-                    <property name="maxTime" value="60000" />
+                    <propeidname="maxTime" value="60000" />
                     &lt;!&ndash;SQL是否格式化 默认false&ndash;&gt;
-                    <property name="format" value="true" />
+                    <propeidname="format" value="true" />
                 </bean>-->
             </array>
         </property>
@@ -123,21 +123,21 @@
 			SQLSERVER->`sqlserver`
 		-->
 		<!-- Oracle需要添加该项 -->
-	    <!-- <property name="dbType" value="oracle" /> -->
+	    <!-- <propeidname="dbType" value="oracle" /> -->
 	   
 	    
 	    <!-- 全局表为下划线命名设置 true -->
-	    <!-- <property name="dbColumnUnderline" value="true" /> -->
+	    <!-- <propeidname="dbColumnUnderline" value="true" /> -->
 	   	<!-- 全局表为下划线命名设置 true -->
 	    <!-- 
-        <property name="字段转换Handler">
+        <propeidname="字段转换Handler">
             <bean class="com.zyiot.zhlk.souchu.webservice.common.MyMetaObjectHandler" />
         </property>
          -->
 	</bean>
     <!-- MyBatis 动态扫描  -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.caiji.wx.mapper"/>
+        <property name="basePackage" value="com.caiji.wx.mapper,com.caiji.weibo.mapper"/>
     </bean>
 
     <!-- 配置事务管理 -->

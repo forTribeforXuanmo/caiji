@@ -6,11 +6,17 @@
 	<resultMap id="BaseResultMap" type="com.caiji.weibo.entity.Wbuser">
 		<id column="ID" property="id" />
 		<result column="WEIBONAME" property="weiboname" />
+		<result column="NEWNAME" property="newName" />
 		<result column="COMMENT" property="comment" />
 		<result column="FANS_NUM" property="fansNum" />
 		<result column="GUANZHU_NUM" property="guanzhuNum" />
 		<result column="WB_NUM" property="wbNum" />
+		<result column="USERID" property="userId" />
 		<result column="CRAWLEVEL" property="crawlevel" />
+
 	</resultMap>
+    <select id="getZhuanfaUserList" resultType="com.caiji.weibo.entity.Wbuser">
+		SELECT * FROM wbuser WHERE CRAWLEVEL=1 OR CRAWLEVEL=2
+	</select>
 
 </mapper>

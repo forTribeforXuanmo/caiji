@@ -22,6 +22,8 @@ public class Wbuser extends Model<Wbuser> {
 	private Integer id;
 	@TableField("WEIBONAME")
 	private String weiboname;
+	@TableField("NEWNAME")
+	private String newName;
     /**
      * 简要的描述
      */
@@ -33,12 +35,29 @@ public class Wbuser extends Model<Wbuser> {
 	private Integer guanzhuNum;
 	@TableField("WB_NUM")
 	private Integer wbNum;
+	@TableField("USERID")
+	private String userId;
     /**
      * 爬取级别 0，1，2 0表示只爬取微博，1表示包括转发，2表示包括转发和评论
      */
 	@TableField("CRAWLEVEL")
 	private Integer crawlevel;
 
+	public String getNewName() {
+		return newName;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public void setNewName(String newName) {
+		this.newName = newName;
+	}
 
 	public Integer getId() {
 		return id;

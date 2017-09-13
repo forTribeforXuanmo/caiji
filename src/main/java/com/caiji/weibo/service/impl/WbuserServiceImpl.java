@@ -6,6 +6,8 @@ import com.caiji.weibo.service.IWbuserService;
 import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务实现类
@@ -16,5 +18,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class WbuserServiceImpl extends ServiceImpl<WbuserMapper, Wbuser> implements IWbuserService {
-	
+
+    @Override
+    public List<Wbuser> getZhuanfaUserList() {
+        return baseMapper.getZhuanfaUserList();
+    }
 }

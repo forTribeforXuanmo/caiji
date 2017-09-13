@@ -1,7 +1,7 @@
 package com.caiji.weibo.service;
 
+import com.caiji.weibo.entity.Wbzhuanfa;
 import com.baomidou.mybatisplus.service.IService;
-import com.caiji.weibo.entity.Wbcomment;
 
 /**
  * <p>
@@ -9,8 +9,8 @@ import com.caiji.weibo.entity.Wbcomment;
  * </p>
  *
  * @author lsz
- * @since 2017-09-08
+ * @since 2017-09-12
  */
-public interface IWbcommentService extends IService<Wbcomment> {
+public interface IWbzhuanfaService extends IService<Wbzhuanfa> {
 	
 }

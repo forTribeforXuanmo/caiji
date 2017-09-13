@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.caiji.weibo.mapper.WbcommentMapper">
+<mapper namespace="com.caiji.weibo.mapper.WbzhuanfaMapper">
 
 	<!-- 通用查询映射结果 -->
-	<resultMap id="BaseResultMap" type="com.caiji.weibo.entity.Wbcomment">
-		<id column="ID" property="id" />
-		<result column="FROM_NAME" property="fromName" />
+	<resultMap id="BaseResultMap" type="com.caiji.weibo.entity.Wbzhuanfa">
+		<result column="ID" property="id" />
 		<result column="FROM_UID" property="fromUid" />
-		<result column="TIME" property="time" />
 		<result column="POSTID" property="postid" />
 		<result column="CONTENT" property="content" />
+		<result column="FROM_NAME" property="fromName" />
+		<result column="TIME" property="time" />
 		<result column="POSTURL" property="posturl" />
 	</resultMap>
 
