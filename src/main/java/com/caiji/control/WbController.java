@@ -1,32 +1,21 @@
 package com.caiji.control;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
 import com.caiji.weibo.entity.Wbpost;
-import com.caiji.weibo.entity.Wbuser;
 import com.caiji.weibo.service.IWbpostService;
 import com.caiji.weibo.service.IWbuserService;
-import com.caiji.weibo.service.WbHandler;
+import com.caiji.weibo.WbHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2017-9-11.
@@ -53,7 +42,14 @@ public class WbController {
     @ResponseBody
     public String login() throws IOException, InterruptedException {
         WebClient client=wbHandler.getClient();
-        wbHandler.login(client);
+        wbHandler.login(client,"15896264186","lishengzhu");
+        return "ok";
+    }
+
+    @RequestMapping("/loginpc")
+    public String loginPC() throws IOException, InterruptedException {
+        WebClient client=wbHandler.getClient();
+        wbHandler.login_pc(client,"17085851332","915623yj");
         return "ok";
     }
 
@@ -62,7 +58,7 @@ public class WbController {
     @ResponseBody
     public String start(HttpServletResponse response) throws IOException, InterruptedException {
         WebClient client = wbHandler.getClient();
-        wbHandler.login(client);
+        wbHandler.login(client,"15896264186","lishengzhu");
         String msg="";
         try {
             msg=wbHandler.saveAllWeiboTopic(client);
@@ -92,7 +88,7 @@ public class WbController {
     @ResponseBody
     public String startZhuanfa() throws IOException, InterruptedException {
         WebClient client=wbHandler.getClient();
-        wbHandler.login(client);
+        wbHandler.login(client,"15896264186","lishengzhu");
         String s = null;
         try {
             s = wbHandler.saveAllWeiboZhuanfa(client);
@@ -110,7 +106,7 @@ public class WbController {
         WebClient client=wbHandler.getClient();
         String s = null;
         try {
-            wbHandler.login(client);
+            wbHandler.login(client,"15896264186","lishengzhu");
             s = wbHandler.saveAllWeiboComment(client);
         } catch (Exception e) {
             s=s+"发生异常"+e;

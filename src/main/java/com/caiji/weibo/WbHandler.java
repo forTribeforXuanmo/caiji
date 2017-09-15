@@ -1,4 +1,4 @@
-package com.caiji.weibo.service;
+package com.caiji.weibo;
 
 import com.baomidou.mybatisplus.toolkit.IdWorker;
 import com.caiji.weibo.entity.Wbcomment;
@@ -6,8 +6,12 @@ import com.caiji.weibo.entity.Wbpost;
 import com.caiji.weibo.entity.Wbuser;
 import com.caiji.weibo.entity.Wbzhuanfa;
 import com.caiji.weibo.listener.ConnectionListener;
+import com.caiji.weibo.service.IWbcommentService;
+import com.caiji.weibo.service.IWbpostService;
+import com.caiji.weibo.service.IWbuserService;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -15,6 +19,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
@@ -32,7 +42,7 @@ public class WbHandler {
     @Autowired
     private IWbcommentService wbcommentService;
 
-    private static final Logger logger = LoggerFactory.getLogger(WbHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WbHandler.class);
     private final String pattern[] = {"yyyy-MM-dd HH:mm:ss"};
 
     /**
@@ -41,13 +51,14 @@ public class WbHandler {
      * @return
      */
     public WebClient getClient() {
-        WebClient webClient = new WebClient(BrowserVersion.CHROME);
+        WebClient webClient = new WebClient(BrowserVersion.FIREFOX_52);
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setUseInsecureSSL(true);
         webClient.getOptions().setRedirectEnabled(true);
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+
         webClient.getCookieManager().setCookiesEnabled(true);
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setTimeout(100000);
@@ -67,19 +78,74 @@ public class WbHandler {
      * @return
      * @throws IOException
      */
-    public static HtmlPage login(WebClient client) throws IOException, InterruptedException {
+    public static HtmlPage login(WebClient client,String account,String password) throws IOException, InterruptedException {
+
         HtmlPage page = client.getPage("https://passport.weibo.cn/signin/login?entry=mweibo&r=http%3A%2F%2Fweibo.cn%2F%3Ffeaturecode%3D20000320%26luicode%3D10000011%26lfid%3D100103type%253D1%2526q%253DEMINEM%25E4%25B8%25AD%25E6%2596%2587%25E7%25BD%2591%25E5%25AE%2598%25E6%2596%25B9%25E5%25BE%25AE%25E5%258D%259A&backTitle=%CE%A2%B2%A9&vt=");
         HtmlInput userName = (HtmlInput) page.getElementById("loginName");
         HtmlInput pwd = (HtmlInput) page.getElementById("loginPassword");
         HtmlAnchor submit = (HtmlAnchor) page.getElementById("loginAction");
-        userName.setValueAttribute("15896264186");
-        pwd.setValueAttribute("lishengzhu");
+        userName.setValueAttribute(account);
+        pwd.setValueAttribute(password);
         HtmlPage myPage = submit.click();
         while (myPage == null) {
             Thread.sleep(1000);
         }
-        //  logger.info("####### 我的微博首页 ####\n" + myPage.asXml());
+
+        LOGGER.info("####### 我的微博首页移动端 ####\n" + myPage.asXml());
         return myPage;
+    }
+    public static void login_pc(WebClient client,String account,String password) throws IOException, InterruptedException {
+
+        HtmlPage page = client.getPage("https://login.sina.com.cn");
+        Thread.sleep(1000);
+        LOGGER.info("pc端"+page.asXml());
+        HtmlInput userName = (HtmlInput) page.getElementById("username");
+        HtmlInput pwd = (HtmlInput) page.getElementById("password");
+        Thread.sleep(500);
+
+        userName.setValueAttribute(account);
+        pwd.setValueAttribute(password);
+        HtmlInput submit =page.querySelector("input[type='submit']");
+
+        HtmlPage click = submit.click();
+
+        HtmlImage vcode_img= (HtmlImage) click.getElementById("check_img");
+        if(vcode_img!=null){
+            String src=vcode_img.getSrcAttribute();
+            if(!"about:blank".equals(src)){
+                //TODO 处理验证码
+
+            }
+        }
+
+
+//
+//
+//        userName.setValueAttribute(account);
+//        pwd.setValueAttribute(password);
+//        HtmlPage myPage = submit.click();
+//        while (myPage == null) {
+//            Thread.sleep(1000);
+//        }
+//
+//        LOGGER.info("####### 我的微博首页pc端 ####\n" + myPage.asXml());
+
+    }
+
+
+    /**
+     * 下载图片到 D:\vcode.jpg
+     * @param imageReader
+     * @return
+     * @throws IOException
+     */
+    public boolean downloadImg(ImageReader imageReader) throws IOException {
+        File file=new File("/vcodeimg.jpg");
+        LOGGER.info("path:"+file.getAbsolutePath());
+        if(!file.exists()){
+            file.createNewFile();
+        }
+       return ImageIO.write(imageReader.read(0),"jpg",file);
     }
 
     /**
@@ -95,18 +161,18 @@ public class WbHandler {
         HtmlPage page = client.getPage("https://weibo.cn/search/?tf=5_012");
         page.getElementByName("keyword").setAttribute("value", name);
         HtmlPage suser = page.getElementByName("suser").click();
-        //logger.info("搜索结果:" + suser.asXml());
+        //LOGGER.info("搜索结果:" + suser.asXml());
         DomElement weiboNameElement = suser.getFirstByXPath("/html/body/table[1]/tbody/tr/td[2]/a");
         if (weiboNameElement != null) {
             trueWeiboName = weiboNameElement.asText();
-            logger.info("查询出的微博名字为:" + trueWeiboName);
+            LOGGER.info("查询出的微博名字为:" + trueWeiboName);
             HtmlPage userWeibo = weiboNameElement.click();
             while (userWeibo == null) {
                 Thread.sleep(500);
             }
             return userWeibo;
         } else {
-            logger.info("搜索不到该微博号");
+            LOGGER.info("搜索不到该微博号");
             throw new RuntimeException("搜索不到该微博号" + name);
         }
     }
@@ -126,7 +192,7 @@ public class WbHandler {
             String name = nameDomText.getWholeText();
             DomText sex_address_dom = page.getFirstByXPath("/html/body/div[4]/table/tbody/tr/td[2]/div/span[1]/text()[2]");
             String sex_address = sex_address_dom.getWholeText();
-            logger.info("微博名" + name + " 性别/地址" + sex_address);
+            LOGGER.info("微博名" + name + " 性别/地址" + sex_address);
             HtmlElement commentSpan = page.getFirstByXPath("/html/body/div[4]/table/tbody/tr/td[2]/div/span[2]");
             String comment = commentSpan.asText();
             String weiboNum = page.querySelector("body > div.u > div > span").asText();
@@ -156,7 +222,7 @@ public class WbHandler {
         for (DomNode node : weibos) {
             count++;
             String postId = node.getAttributes().getNamedItem("id").getNodeValue();
-            logger.info("id" + postId);
+            LOGGER.info("id" + postId);
             List<DomNode> divs = node.querySelectorAll("div");
             String finallyTime = "";
             String content = "无";
@@ -185,7 +251,7 @@ public class WbHandler {
                 pinglun = div.querySelector("a[href*='https://weibo.cn/comment/']").asText();
                 pinglun = pinglun.substring(3, pinglun.length() - 1);
                 url = div.querySelector("a[href*='https://weibo.cn/comment/']").getAttributes().getNamedItem("href").getNodeValue();
-                logger.info("id=" + postId + " time=" + time + " zan=" + zan + " zhuanfa=" + zhuanfa + " pinglun=" + pinglun + " url=" + url);
+                LOGGER.info("id=" + postId + " time=" + time + " zan=" + zan + " zhuanfa=" + zhuanfa + " pinglun=" + pinglun + " url=" + url);
             } else if (divs.size() == 2) {
 
                 DomNode div1 = divs.get(0);
@@ -213,9 +279,9 @@ public class WbHandler {
                 pinglun = pinglun.substring(3, pinglun.length() - 1);
                 url = div2.querySelector("a[href*='https://weibo.cn/comment/']").getAttributes().getNamedItem("href").getNodeValue();
                 String time = div2.querySelector("span.ct").asText();
-                logger.info("time" + time);
+                LOGGER.info("time" + time);
                 finallyTime = time.substring(0, time.indexOf("来自"));
-                logger.info("id=" + id + " time=" + time + " zan=" + zan + " zhuanfa=" + zhuanfa + " pinglun=" + pinglun + " url=" + url);
+                LOGGER.info("id=" + id + " time=" + time + " zan=" + zan + " zhuanfa=" + zhuanfa + " pinglun=" + pinglun + " url=" + url);
             } else if (divs.size() == 3) {
                 DomNode div1 = divs.get(0);
                 DomNode div3 = divs.get(2);
@@ -251,7 +317,7 @@ public class WbHandler {
 
             }
             finallyTime = converseTime(finallyTime.trim(), nowLine);
-            //logger.info("时间"+finallyTime);
+            //LOGGER.info("时间"+finallyTime);
             if (DateUtils.addDays(nowLine, -31).getTime() <= DateUtils.parseDate(finallyTime, pattern).getTime()) {
                 //存入数据库
                 Wbpost wbpost = new Wbpost();
@@ -265,12 +331,12 @@ public class WbHandler {
                 wbpost.setUrl(url);
                 wbpost.setZhaunfaUrl(zhuanfaUrl);
                 wbpostService.insertOrUpdate(wbpost);
-                logger.info(wbpost.toString());
+                LOGGER.info(wbpost.toString());
             } else {
                 if (count != 1 && pageNo != 1) {
                     shouldGetNextPage = false;  //时间不对不翻页了，并且不是置顶的
-                    logger.info("停止翻页");
-                    logger.info(finallyTime);
+                    LOGGER.info("停止翻页");
+                    LOGGER.info(finallyTime);
                     return shouldGetNextPage;
                 }
             }
@@ -290,7 +356,7 @@ public class WbHandler {
      * @throws IOException
      */
     public void saveOneWholeWeibo(HtmlPage indexPage, Integer id, int pageNo) throws ParseException, InterruptedException, IOException {
-        logger.info("第" + pageNo + "页");
+        LOGGER.info("第" + pageNo + "页");
 
         boolean shouldGetNextPage = saveWbToDB(indexPage, id, pageNo);
         if (shouldGetNextPage) {
@@ -302,7 +368,7 @@ public class WbHandler {
             }
             if (nextPage != null) {
                 indexPage = nextPage.click();
-                logger.info("###########点击的了下页########");
+                LOGGER.info("###########点击的了下页########");
                 Thread.sleep(500);
                 while (indexPage.querySelector(".b") == null) {
                     Thread.sleep(500);
@@ -362,14 +428,14 @@ public class WbHandler {
         }
         zfStr = zfStr.substring(3, zfStr.length() - 1);
         if ("0".equals(zfStr)) {
-            logger.info("没有转发数,结束");
+            LOGGER.info("没有转发数,结束");
             return true;
         } else {
             while (true) {
                 DomNodeList<DomNode> domNodes = page.querySelectorAll(".c");
                 while (domNodes == null) {
                     Thread.sleep(500);
-                    logger.info("停了500毫秒");
+                    LOGGER.info("停了500毫秒");
                 }
 
                 Date nowLine = new Date();
@@ -380,7 +446,7 @@ public class WbHandler {
                     HtmlElement user = (HtmlElement) childNodes.get(0);
                     int k = 1;
                     if (user instanceof HtmlSpan) {
-                        logger.info("第一个是span类型");  //不去读取热门 ，因为后面可以获取到
+                        LOGGER.info("第一个是span类型");  //不去读取热门 ，因为后面可以获取到
                         continue;
                     }
                     String userIdHref = user.getAttribute("href");
@@ -412,7 +478,7 @@ public class WbHandler {
                 HtmlAnchor nextPageLink = null;
                 try {
                     nextPageLink = page.getAnchorByText("下页");
-                    logger.info("点击下页");
+                    LOGGER.info("点击下页");
                     page = nextPageLink.click();
 
                 } catch (ElementNotFoundException e) {
@@ -430,23 +496,23 @@ public class WbHandler {
      * @param client
      */
     public String saveAllWeiboZhuanfa(WebClient client) throws IOException, InterruptedException {
-        logger.info("####### 启动转发爬取 ########## ");
+        LOGGER.info("####### 启动转发爬取 ########## ");
         StringBuilder sb = new StringBuilder();
         List<Wbuser> levelOne = wbuserService.getZhuanfaUserList();
         Map map=new HashMap(1);
         for (Wbuser wbuser : levelOne) {
-            logger.info("开始《" + wbuser.getWeiboname() + "》 真实微博名+" + wbuser.getNewName() + "的转发爬取");
+            LOGGER.info("开始《" + wbuser.getWeiboname() + "》 真实微博名+" + wbuser.getNewName() + "的转发爬取");
             map.put("WBUSERTABLE_ID", wbuser.getId());
             List<Wbpost> user_Post_List = wbpostService.selectByMap(map);
             for (Wbpost wbpost : user_Post_List) {
-                logger.info("微博链接" + wbpost.getZhaunfaUrl());
+                LOGGER.info("微博链接" + wbpost.getZhaunfaUrl());
                 Long s = System.currentTimeMillis();
                 saveWholeZhuanfaInOneWbToDB(wbpost.getZhaunfaUrl(), client, wbpost.getId());
                 Long e = System.currentTimeMillis();
                 sb.append("爬取转发微博" + wbpost.getUrl() + " 耗时" + (e - s) / 1000 + "秒\n");
             }
         }
-        logger.info("#############  转发爬取结束 #########   ");
+        LOGGER.info("#############  转发爬取结束 #########   ");
         return sb.toString();
     }
 
@@ -463,14 +529,14 @@ public class WbHandler {
         HtmlSpan zanSpan = page.querySelector("span.pms");
         String zanNum=zanSpan.asText().trim();
         if(zanNum.length()==2||zanNum.substring(3,zanNum.length()-1).equals("0")){
-            logger.info("===没有评论==="+link);
+            LOGGER.info("===没有评论==="+link);
             return;
         }else {
             while (true) {
                 DomNodeList<DomNode> domNodes = page.querySelectorAll(".c");
                 while (domNodes == null) {
                     Thread.sleep(500);
-                    logger.info("停了500毫秒");
+                    LOGGER.info("停了500毫秒");
                 }
 
                 Date nowLine = new Date();
@@ -481,9 +547,9 @@ public class WbHandler {
                     DomNodeList<DomNode> childNodes = node.getChildNodes();
 
                     DomNode firstEle = childNodes.get(0);
-                    logger.info(firstEle.getNodeName()+"-"+firstEle.getNodeValue());
+                    //LOGGER.info(firstEle.getNodeName()+"-"+firstEle.getNodeValue());
                     if (firstEle instanceof HtmlSpan || childNodes.getLength()<5) {
-                        logger.info("热门或者查看更多"); //直接不读取热门，因为后面可以抓取得到
+                        LOGGER.info("热门或者查看更多"); //直接不读取热门，因为后面可以抓取得到
                         continue;
                     }
                     HtmlAnchor user=node.querySelector("a");
@@ -513,7 +579,7 @@ public class WbHandler {
                 HtmlAnchor nextPageLink = null;
                 try {
                     nextPageLink = page.getAnchorByText("下页");
-                    logger.info("点击下页");
+                    LOGGER.info("点击下页");
                     page = nextPageLink.click();
                 } catch (ElementNotFoundException e) {
                     return ;
@@ -531,25 +597,25 @@ public class WbHandler {
      * @throws InterruptedException
      */
     public String saveAllWeiboComment(WebClient client) throws IOException, InterruptedException {
-        logger.info("####### 启动评论爬取 ########## ");
+        LOGGER.info("####### 启动评论爬取 ########## ");
         StringBuilder sb = new StringBuilder();
         Map map = new HashMap<String, Object>(1);
         map.put("CRAWLEVEL", 2);
         List<Wbuser> levelOne = wbuserService.selectByMap(map);
         for (Wbuser wbuser : levelOne) {
-            logger.info("开始《" + wbuser.getWeiboname() + "》 真实微博名+" + wbuser.getNewName() + "的评论爬取");
+            LOGGER.info("开始《" + wbuser.getWeiboname() + "》 真实微博名+" + wbuser.getNewName() + "的评论爬取");
             map.clear();
             map.put("WBUSERTABLE_ID", wbuser.getId());
             List<Wbpost> user_Post_List = wbpostService.selectByMap(map);
             for (Wbpost wbpost : user_Post_List) {
-                logger.info("微博链接" + wbpost.getUrl());
+                LOGGER.info("微博链接" + wbpost.getUrl());
                 Long s = System.currentTimeMillis();
                 saveWholeCommentInOneWbToDB(wbpost.getUrl(), client, wbpost.getId());
                 Long e = System.currentTimeMillis();
                 sb.append("爬取评论微博" + wbpost.getUrl() + " 耗时" + (e - s) / 1000 + "秒\n");
             }
         }
-        logger.info("#############  评论爬取结束 #########   ");
+        LOGGER.info("#############  评论爬取结束 #########   ");
         return sb.toString();
     }
 
@@ -603,8 +669,8 @@ public class WbHandler {
         WebClient client = getClient();
         Page page = client.getPage("https://m.weibo.cn/p/100103type%3D1%26q%3D%E7%8E%8B%E5%AE%9D%E5%BC%BA?type=all&queryVal=%E7%8E%8B%E5%AE%9D%E5%BC%BA&featurecode=20000320&luicode=10000011&lfid=100103type%3D1%26q%3Dsss&title=%E7%8E%8B%E5%AE%9D%E5%BC%BA");
         Thread.sleep(10000);
-        logger.info(page.getWebResponse().getResponseHeaders().toString());
-        logger.info("直接getPage" + page.toString() + "url\n" + page.getUrl() + "是html类型?" + page.isHtmlPage() + "response\n" + page.getWebResponse().getContentAsString());
+        LOGGER.info(page.getWebResponse().getResponseHeaders().toString());
+        LOGGER.info("直接getPage" + page.toString() + "url\n" + page.getUrl() + "是html类型?" + page.isHtmlPage() + "response\n" + page.getWebResponse().getContentAsString());
 
         client.close();
     }
