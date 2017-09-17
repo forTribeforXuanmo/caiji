@@ -25,7 +25,7 @@ import org.apache.http.util.EntityUtils;
 public class RegeitTest {
     static public void main(String[] args) throws IOException {
         HttpClient httpclient = new DefaultHttpClient();
-        HttpUriRequest getMethod = new HttpGet("验证码URL");
+       // HttpUriRequest getMethod = new HttpGet("验证码URL");
         /*for(int i=1;i<=10;i++){
             try {
                 String yzm = "";

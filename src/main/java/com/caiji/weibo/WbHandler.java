@@ -113,6 +113,7 @@ public class WbHandler {
         if(vcode_img!=null){
             String src=vcode_img.getSrcAttribute();
             if(!"about:blank".equals(src)){
+                downloadImg(vcode_img.getImageReader());
                 //TODO 处理验证码
 
             }
@@ -139,7 +140,7 @@ public class WbHandler {
      * @return
      * @throws IOException
      */
-    public boolean downloadImg(ImageReader imageReader) throws IOException {
+    public static boolean downloadImg(ImageReader imageReader) throws IOException {
         File file=new File("/vcodeimg.jpg");
         LOGGER.info("path:"+file.getAbsolutePath());
         if(!file.exists()){

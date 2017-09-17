@@ -1,4 +1,5 @@
 package com.caiji.util;
+
 import com.github.jaiimageio.plugins.tiff.TIFFImageWriteParam;
 
 import java.awt.Graphics2D;
@@ -141,8 +142,7 @@ public class ImageIOHelper {
         return bufferedImage;
     }
 
-    public static BufferedImage imageProducerToBufferedImage(
-            ImageProducer imageProducer) {
+    public static BufferedImage imageProducerToBufferedImage(ImageProducer imageProducer) {
         return imageToBufferedImage(Toolkit.getDefaultToolkit().createImage(
                 imageProducer));
     }

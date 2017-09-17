@@ -147,7 +147,7 @@ public class VCode {
     public static Map<BufferedImage, String> loadTrainData() throws Exception {
         if (trainMap == null) {
             Map<BufferedImage, String> map = new HashMap<BufferedImage, String>();
-            File dir = new File("train4");
+            File dir = new File("d:\\train4");
             File[] files = dir.listFiles();
             for (File file : files) {
                 map.put(ImageIO.read(file), file.getName().charAt(0) + "");
@@ -290,7 +290,7 @@ public class VCode {
             result += getSingleCharOcr(bi, map);
         }
         System.out.println(result);
-        ImageIO.write(img, "JPG", new File("result4//" + result + ".jpg"));
+        ImageIO.write(img, "JPG", new File("d:\\result4\\" + result + ".jpg"));
         return result;
     }
 
