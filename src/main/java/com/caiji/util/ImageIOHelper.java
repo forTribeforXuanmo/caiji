@@ -68,6 +68,8 @@ public class ImageIOHelper {
         return tempFile;
     }
 
+
+
     public static File createImage(BufferedImage bi) {
         File tempFile = null;
         try {
