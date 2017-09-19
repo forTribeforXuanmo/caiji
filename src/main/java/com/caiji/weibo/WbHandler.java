@@ -1,6 +1,9 @@
 package com.caiji.weibo;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.IdWorker;
+import com.caiji.util.ChaoJiYing;
 import com.caiji.weibo.entity.Wbcomment;
 import com.caiji.weibo.entity.Wbpost;
 import com.caiji.weibo.entity.Wbuser;
@@ -11,7 +14,6 @@ import com.caiji.weibo.service.IWbpostService;
 import com.caiji.weibo.service.IWbuserService;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.*;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -21,9 +23,6 @@ import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
@@ -110,26 +109,41 @@ public class WbHandler {
         HtmlPage click = submit.click();
 
         HtmlImage vcode_img= (HtmlImage) click.getElementById("check_img");
-        if(vcode_img!=null){
+
+        while(vcode_img!=null){
             String src=vcode_img.getSrcAttribute();
             if(!"about:blank".equals(src)){
-                downloadImg(vcode_img.getImageReader());
-                //TODO 处理验证码
+                if(downloadImg(vcode_img.getImageReader())){
+                    ResourceBundle resource = ResourceBundle.getBundle("chaojiying");
+                    String cjy_name=resource.getString("username");
+                    String cjy_password=resource.getString("password");
+                    String cjy_softid=resource.getString("softid");
+                    String result= ChaoJiYing.PostPic(cjy_name,cjy_password,cjy_softid,"1005","5","d:\\vcodeimg.png");
+                    LOGGER.info("验证码为："+result);
+                    JSONObject map= JSONObject.parseObject(result);
+                    //图片id
+                    String pic_id=map.getString("pic_id");
+                    //识别出的字符
+                    String pic_str=map.getString("pic_str");
+                    Thread.sleep(2000);
+                    HtmlInput yzm_input = (HtmlInput) click.getElementById("door");
+                    yzm_input.setValueAttribute(pic_str);
+                    submit=click.querySelector("input[type='submit']");
+                    click=submit.click();
+                    vcode_img= (HtmlImage) click.getElementById("check_img");
+                    if(vcode_img!=null){
+                        //说明还在登录页面，验证码错误
+                        //发送错误报告给超级鹰平台返回题分
+                        ChaoJiYing.ReportError(cjy_name,password,cjy_softid,pic_id);
+                    }
+                }else {
+                    LOGGER.info("保存验证码到本地失败");
 
+                }
             }
         }
 
-
-//
-//
-//        userName.setValueAttribute(account);
-//        pwd.setValueAttribute(password);
-//        HtmlPage myPage = submit.click();
-//        while (myPage == null) {
-//            Thread.sleep(1000);
-//        }
-//
-//        LOGGER.info("####### 我的微博首页pc端 ####\n" + myPage.asXml());
+       LOGGER.info("####### 我的微博首页pc端 ####\n" + click.asXml());
 
     }
 
@@ -141,12 +155,12 @@ public class WbHandler {
      * @throws IOException
      */
     public static boolean downloadImg(ImageReader imageReader) throws IOException {
-        File file=new File("/vcodeimg.jpg");
+        File file=new File("D:\\vcodeimg.png");
         LOGGER.info("path:"+file.getAbsolutePath());
         if(!file.exists()){
             file.createNewFile();
         }
-       return ImageIO.write(imageReader.read(0),"jpg",file);
+       return ImageIO.write(imageReader.read(0),"png",file);
     }
 
     /**

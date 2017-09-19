@@ -55,8 +55,9 @@ public class ConnectionListener extends FalsifyingWebConnection {
                 try {
                     webClient.getCookieManager().clearCookies();
                     LOGGER.info("======= 开始重新登录 ========");
-                    WbHandler.login(webClient,ACCOUNT[index],PASSWORD[index]);
+                    WbHandler.login_pc(webClient,ACCOUNT[index],PASSWORD[index]);
                     index=(index+1)%ACCOUNT.length;
+                   // WbHandler.login_pc(webClient,"15896264186","lishengzhu");
                     LOGGER.info("=====已重新登录=======");
                     LOGGER.info("======重新进入url "+url);
                     HtmlPage page = webClient.getPage(url);

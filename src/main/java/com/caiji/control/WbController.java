@@ -1,6 +1,8 @@
 package com.caiji.control;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.caiji.quartze.QuartzManager;
+import com.caiji.quartze.WbCrawlJob;
 import com.caiji.weibo.entity.Wbpost;
 import com.caiji.weibo.service.IWbpostService;
 import com.caiji.weibo.service.IWbuserService;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequestMapping("/wb")
 public class WbController {
     private static final Logger LOGGER= LoggerFactory.getLogger(WbController.class);
+
     @Autowired
     private WbHandler wbHandler;
     @Autowired
@@ -50,11 +53,11 @@ public class WbController {
     public String loginPC() throws IOException, InterruptedException {
         WebClient client=wbHandler.getClient();
         wbHandler.login_pc(client,"17085851332","915623yj");
-        return "ok";
+        return "success";
     }
 
 
-    @RequestMapping("/start")
+    @RequestMapping("/startTopic")
     @ResponseBody
     public String start(HttpServletResponse response) throws IOException, InterruptedException {
         WebClient client = wbHandler.getClient();
@@ -114,6 +117,23 @@ public class WbController {
             client.close();
             return s;
         }
+    }
+
+    @RequestMapping("/startQuartz")
+    @ResponseBody
+    public String startQuartz(){
+        String job_name = "新浪微博采集";
+       LOGGER.info("【任务启动】开始(每隔2小时抓取一次)...");
+        QuartzManager.addJob(job_name, WbCrawlJob.class, "* * 0/2 * * ?");
+        return "success";
+    }
+    @RequestMapping("/stopQuartz")
+    @ResponseBody
+    public String stopQuzrtz(){
+        String job_name="新浪微博采集";
+        QuartzManager.shutdownJobs();
+        LOGGER.info("【任务已停止】...");
+        return "success";
     }
 
 }

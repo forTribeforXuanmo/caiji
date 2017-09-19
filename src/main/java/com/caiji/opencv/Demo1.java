@@ -13,11 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import static org.opencv.core.CvType.CV_8UC1;
-import static org.opencv.imgproc.Imgproc.MORPH_RECT;
-import static org.opencv.imgproc.Imgproc.dilate;
-import static org.opencv.imgproc.Imgproc.erode;
-import static org.opencv.photo.Photo.INPAINT_TELEA;
+
 
 /**
  * author: lishengzhu
@@ -70,16 +66,16 @@ public class Demo1 {
 
     public static void opencvImage(){
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        Mat mat= Mat.eye(3,3, CV_8UC1);
+        Mat mat= Mat.eye(3,3, CvType.CV_8UC1);
         System.out.println("mat="+mat.dump());
 
         Mat mat1 = Highgui.imread("d:\\yzm\\out\\vcode_out.png");
 
         Mat mat2=mat1.clone();
         Mat mat3=mat1.clone();
-        Mat kern = Imgproc.getStructuringElement(MORPH_RECT, new Size(2, 2));
+        Mat kern = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(2, 2));
         Imgproc.erode(mat1,mat2,kern);  //腐蚀
-        dilate(mat1,mat3,kern);  //膨胀
+        Imgproc.dilate(mat1,mat3,kern);  //膨胀
         Highgui.imwrite("d:\\fushi.png",mat2);
         Highgui.imwrite("d:\\pengzhang.png",mat3);
 
@@ -168,17 +164,17 @@ public class Demo1 {
         Mat mat=Highgui.imread(path);
         Mat matGray=mat.clone();
         Imgproc.cvtColor(mat,matGray,Imgproc.COLOR_RGB2GRAY,0);
-        Mat imageMask = new Mat(mat.size(), CV_8UC1, Scalar.all(0));
+        Mat imageMask = new Mat(mat.size(), CvType.CV_8UC1, Scalar.all(0));
 
 
         //通过阈值处理生成Mask
         Imgproc.threshold(matGray, imageMask, 240, 100, Imgproc.THRESH_BINARY);
-        Mat Kernel = Imgproc.getStructuringElement(MORPH_RECT, new Size(3, 3));
+        Mat Kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
         //对Mask膨胀处理，增加Mask面积
         //dilate(imageMask, imageMask, Kernel);
         //erode(imageMask,imageMask,Kernel);
         //图像修复
-        Photo.inpaint(mat, imageMask, mat, 5, INPAINT_TELEA);
+        Photo.inpaint(mat, imageMask, mat, 5, Photo.INPAINT_TELEA);
         Highgui.imwrite(parent+File.separator+fileName+"xiufu.tif",mat);
         Highgui.imwrite(parent+File.separator+fileName+"yanma.tif",imageMask);
 
