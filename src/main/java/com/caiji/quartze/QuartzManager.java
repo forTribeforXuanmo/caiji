@@ -3,9 +3,13 @@ package com.caiji.quartze;
 import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Administrator on 2017-9-19.
+ * 不与spring结合的普通任务调度管理类
+ * 这个job里面不能有注入
  */
 public class QuartzManager {
     private static SchedulerFactory SchedulerFactory=new StdSchedulerFactory();

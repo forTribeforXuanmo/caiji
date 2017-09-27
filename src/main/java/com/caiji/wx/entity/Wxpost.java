@@ -73,7 +73,7 @@ public class Wxpost extends Model<Wxpost> {
      * 文章时间戳
      */
 	@TableField("DATETIME")
-	private Long datetime;
+	private String datetime;
 	@TableField("READNUM")
 	private Integer readnum;
 	@TableField("LIKENUM")
@@ -179,11 +179,11 @@ public class Wxpost extends Model<Wxpost> {
 		this.isTop = isTop;
 	}
 
-	public Long getDatetime() {
+	public String getDatetime() {
 		return datetime;
 	}
 
-	public void setDatetime(Long datetime) {
+	public void setDatetime(String datetime) {
 		this.datetime = datetime;
 	}
 

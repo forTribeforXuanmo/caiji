@@ -9,6 +9,8 @@ import com.caiji.wx.service.IWeixinService;
 import com.caiji.wx.service.IWxpostService;
 import com.caiji.wx.service.IWxtmplistService;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,8 @@ import java.util.*;
 @RequestMapping("wx")
 public class WxController {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(WxController.class);
+
+    private final String pattern[] = {"yyyy-MM-dd HH:mm:ss"};
     /**
      * 已经抓取的文章的链接
      */
@@ -84,7 +88,7 @@ public class WxController {
 
         try {
             return getMsgJson(request);
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return "";
@@ -92,8 +96,12 @@ public class WxController {
     }
 
     public synchronized String getMsgJson(HttpServletRequest request) throws UnsupportedEncodingException {
-
-        String str = StringEscapeUtils.unescapeHtml(StringEscapeUtils.unescapeHtml(URLDecoder.decode(request.getParameter("str"), "utf-8")));
+        Date now=new Date();
+        String strTmp=URLDecoder.decode(request.getParameter("str"),"utf-8");
+        logger.info(strTmp);
+        strTmp=strTmp.replaceAll("&quot;&amp;","&amp;");
+       // logger.info(StringEscapeUtils.unescapeHtml(strTmp));
+        String str = StringEscapeUtils.unescapeHtml(StringEscapeUtils.unescapeHtml(strTmp));
         String url = URLDecoder.decode(request.getParameter("url"));
         String respData = request.getParameter("respData");
         logger.info(url);
@@ -169,7 +177,13 @@ public class WxController {
         }
 
         /****读取文章列表数据********/
-        Map<String, Object> json = JSON.parseObject(str, HashMap.class);
+        Map<String, Object> json = null;
+        try {
+            json = JSON.parseObject(str, HashMap.class);
+        } catch (Exception e) {
+            logger.error("!!!!!!!!出现JSON转map异常  要转的字符串为\n"+str,e);
+        }
+
         List<Map<String, Object>> list = (List<Map<String, Object>>) json.get("list");
         for (Map<String, Object> map : list) {
             //第一部分
@@ -185,6 +199,23 @@ public class WxController {
                 String is_multi = String.valueOf(app_msg_ext_info.get("is_multi"));
                 //一组文章的时间
                 long datetime = (long) ((int) comm_msg_info.get("datetime"));
+                Date postDate=new Date(datetime*1000);
+                if(DateUtils.addDays(now,-31).getTime()>postDate.getTime()){
+                    //进入文章
+                    VisitContentUrl = wxpostService.selectContentUrlList(NowBiz);
+                    if(VisitContentUrl.size()==0){
+                        //该公众号没有文章，直接取下一个
+                        String nextBizUrl="new:https://mp.weixin.qq.com" + getNextBizUrl();
+                        return nextBizUrl;
+                    }
+                    String nextContentUrl = VisitContentUrl.get(0);
+                    String wxTopicUrl = "new:" + nextContentUrl.substring(0, nextContentUrl.indexOf("scene")) + "scene=38" + "&pass_ticket=" + NowPassTicket;
+                    OffsetException = false;
+                    logger.info("===准备第一次进入文章 url（" + wxTopicUrl + ")=========");
+                    return wxTopicUrl;
+                }
+                String postDateStr = DateFormatUtils.format(postDate, pattern[0]);
+
 
                 if (wxpostList == null || wxpostList.size() == 0) {
                     //排除为空的情况，为空的不写入数据库
@@ -214,7 +245,7 @@ public class WxController {
                         wxpost.setCover(cover);
                         wxpost.setIsMulti(is_multi);
                         wxpost.setIsTop(is_top);
-                        wxpost.setDatetime(datetime);
+                        wxpost.setDatetime(postDateStr);
                         wxpost.setSn(sn);
                         wxpostService.insert(wxpost);
                         OneBizTopicCount++;
@@ -255,7 +286,7 @@ public class WxController {
                                 wxpost.setCover(cover);
                                 wxpost.setIsMulti(is_multi);
                                 wxpost.setIsTop(is_top);
-                                wxpost.setDatetime(datetime);
+                                wxpost.setDatetime(postDateStr);
                                 wxpost.setSn(sn);
                                 wxpostService.insert(wxpost);
                                 OneBizTopicCount++;
@@ -317,7 +348,7 @@ public class WxController {
         if (WeixinList == null || WeixinList.size() == 0) {
             logger.info("#############已经抓取完一轮,暂停10秒，继续下一轮############");
             try {
-                Thread.sleep(10000);
+                Thread.sleep(1000*60*60);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -328,8 +359,8 @@ public class WxController {
             nextBiz = WeixinList.get(1).getBiz();
         }
         return nextBiz;
-    }
 
+    }
 
     /**
      * 获取下个公众号的url

@@ -20,6 +20,7 @@
 		<result column="LIKENUM" property="likenum" />
 		<result column="SN" property="sn" />
 	</resultMap>
+
 	<select id="selectPostByContentUrl" parameterType="java.lang.String" resultMap="BaseResultMap">
 		SELECT * FROM wxpost WHERE CONTENT_URL=#{contentUrl}
 	</select>
@@ -27,6 +28,7 @@
 	<update id="updateNum" >
 		UPDATE wxpost SET READNUM=#{readNum} ,LIKENUM=#{likeNum} WHERE BIZ=#{biz} AND SN=#{sn}
 	</update>
+
 	<select id="selectContentUrlList" parameterType="java.lang.String" resultType="java.lang.String" >
 		SELECT CONTENT_URL FROM wxpost WHERE BIZ=#{biz}
 	</select>

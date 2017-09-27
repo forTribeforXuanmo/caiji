@@ -1,6 +1,5 @@
 package com.caiji.weibo;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.toolkit.IdWorker;
 import com.caiji.util.ChaoJiYing;
@@ -12,14 +11,22 @@ import com.caiji.weibo.listener.ConnectionListener;
 import com.caiji.weibo.service.IWbcommentService;
 import com.caiji.weibo.service.IWbpostService;
 import com.caiji.weibo.service.IWbuserService;
+import com.caiji.weibo.service.impl.WbpostServiceImpl;
+import com.caiji.weibo.service.impl.WbuserServiceImpl;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.*;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.springframework.ui.context.support.UiApplicationContextUtils;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -31,8 +38,7 @@ import java.util.*;
 /**
  * Created by Administrator on 2017-9-4.
  */
-@Component
-public class WbHandler {
+public class WbHandler{
 
     @Autowired
     private IWbuserService wbuserService;
@@ -41,8 +47,11 @@ public class WbHandler {
     @Autowired
     private IWbcommentService wbcommentService;
 
+
     private static final Logger LOGGER = LoggerFactory.getLogger(WbHandler.class);
     private final String pattern[] = {"yyyy-MM-dd HH:mm:ss"};
+
+
 
     /**
      * 获取调整参数了的Client实例
@@ -318,6 +327,7 @@ public class WbHandler {
                     } else {
                         zan = zanDiv.get(0).asText();
                     }
+                    zan = zan.substring(3, zan.length() - 1);
                 }
                 zhuanfa = div3.querySelector("a[href*='https://weibo.cn/repost/']").asText();
                 zhuanfa = zhuanfa.substring(3, zhuanfa.length() - 1);
@@ -407,7 +417,6 @@ public class WbHandler {
     public String saveAllWeiboTopic(WebClient client) throws IOException, InterruptedException, ParseException {
         StringBuilder sb = new StringBuilder();
         List<Wbuser> userList = wbuserService.selectList(null);
-
         for (int i = 0; i < userList.size(); i++) {
             Long s = System.currentTimeMillis();
             String name = userList.get(i).getWeiboname();

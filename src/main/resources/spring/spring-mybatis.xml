@@ -84,7 +84,12 @@
     <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <!-- 自动扫描Mapping.xml文件 -->
-        <property name="mapperLocations" value="classpath:com/caiji/wx/mapper/xml/*.xml,classpath*:com/caiji/weibo/mapper/xml/*.xml"/>
+        <property name="mapperLocations">
+            <array>
+                <value>classpath:com/caiji/weibo/mapper/xml/*.xml</value>
+                <value>classpath:com/caiji/wx/mapper/xml/*.xml</value>
+            </array>
+        </property>
         <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
         <property name="typeAliasesPackage" value="com.caiji.wx.entity,com.caiji.weibo.entity"/>
         <property name="plugins">

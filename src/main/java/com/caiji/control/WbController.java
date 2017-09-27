@@ -1,9 +1,11 @@
 package com.caiji.control;
 
 import com.baomidou.mybatisplus.mapper.EntityWrapper;
+import com.caiji.quartze.JobManage;
 import com.caiji.quartze.QuartzManager;
-import com.caiji.quartze.WbCrawlJob;
+import com.caiji.weibo.entity.Schedulejob;
 import com.caiji.weibo.entity.Wbpost;
+import com.caiji.quartze.ISchedulejobService;
 import com.caiji.weibo.service.IWbpostService;
 import com.caiji.weibo.service.IWbuserService;
 import com.caiji.weibo.WbHandler;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Administrator on 2017-9-11.
@@ -28,12 +30,19 @@ public class WbController {
     private static final Logger LOGGER= LoggerFactory.getLogger(WbController.class);
 
     @Autowired
-    private WbHandler wbHandler;
-    @Autowired
     private IWbuserService wbuserService;
 
     @Autowired
     private IWbpostService wbpostService;
+
+    @Autowired
+    private ISchedulejobService schedulejobService;
+
+    @Autowired
+    private JobManage jobManage;
+
+    @Autowired
+    private WbHandler wbHandler;
 
     @RequestMapping("/index")
     public String index(){
@@ -44,6 +53,7 @@ public class WbController {
     @RequestMapping("/login")
     @ResponseBody
     public String login() throws IOException, InterruptedException {
+
         WebClient client=wbHandler.getClient();
         wbHandler.login(client,"15896264186","lishengzhu");
         return "ok";
@@ -51,6 +61,7 @@ public class WbController {
 
     @RequestMapping("/loginpc")
     public String loginPC() throws IOException, InterruptedException {
+
         WebClient client=wbHandler.getClient();
         wbHandler.login_pc(client,"17085851332","915623yj");
         return "success";
@@ -60,6 +71,7 @@ public class WbController {
     @RequestMapping("/startTopic")
     @ResponseBody
     public String start(HttpServletResponse response) throws IOException, InterruptedException {
+
         WebClient client = wbHandler.getClient();
         wbHandler.login(client,"15896264186","lishengzhu");
         String msg="";
@@ -90,6 +102,7 @@ public class WbController {
     @RequestMapping("/startZhuanfa")
     @ResponseBody
     public String startZhuanfa() throws IOException, InterruptedException {
+
         WebClient client=wbHandler.getClient();
         wbHandler.login(client,"15896264186","lishengzhu");
         String s = null;
@@ -106,6 +119,7 @@ public class WbController {
     @RequestMapping("/startComment")
     @ResponseBody
     public String startComment(){
+
         WebClient client=wbHandler.getClient();
         String s = null;
         try {
@@ -122,10 +136,14 @@ public class WbController {
     @RequestMapping("/startQuartz")
     @ResponseBody
     public String startQuartz(){
-        String job_name = "新浪微博采集";
-       LOGGER.info("【任务启动】开始(每隔2小时抓取一次)...");
-        QuartzManager.addJob(job_name, WbCrawlJob.class, "* * 0/2 * * ?");
-        return "success";
+        Schedulejob schedulejob=new Schedulejob();
+        schedulejob.setJobId(2);
+        schedulejob.setJobName("wbJob_No1");
+        schedulejob.setJobGroup("lsz");
+        schedulejob.setJobStatus("1");
+        schedulejob.setCronExpression("* * 0/2 * * ?".trim());
+        jobManage.addJob(schedulejob);
+        return "success:";
     }
     @RequestMapping("/stopQuartz")
     @ResponseBody
@@ -136,4 +154,18 @@ public class WbController {
         return "success";
     }
 
+    @RequestMapping("/test")
+    @ResponseBody
+    public String test(){
+        return "success";
+    }
+
+    @RequestMapping("/showJob")
+    @ResponseBody
+    public Map showJob(){
+        List<Schedulejob> schedulejobs = schedulejobService.selectList(null);
+        Map  map=new HashMap();
+        map.put("data",schedulejobs);
+        return map;
+    }
 }

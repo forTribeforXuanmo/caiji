@@ -57,7 +57,7 @@
         <version>2.2</version>
         <configuration>
           <port>8088</port>
-          <path>/</path>
+          <path>/caiji</path>
           <uriEncoding>UTF-8</uriEncoding>
           <finalName>caiji</finalName>
           <server>tomcat7</server>

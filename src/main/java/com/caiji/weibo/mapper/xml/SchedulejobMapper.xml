@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caiji.weibo.mapper.SchedulejobMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="com.caiji.weibo.entity.Schedulejob">
+		<id column="job_id" property="jobId" />
+		<result column="job_name" property="jobName" />
+		<result column="job_group" property="jobGroup" />
+		<result column="job_status" property="jobStatus" />
+		<result column="cron_expression" property="cronExpression" />
+		<result column="job_desc" property="jobDesc" />
+	</resultMap>
+
+</mapper>
