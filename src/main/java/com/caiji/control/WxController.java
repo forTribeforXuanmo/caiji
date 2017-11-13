@@ -201,7 +201,7 @@ public class WxController {
                 long datetime = (long) ((int) comm_msg_info.get("datetime"));
                 Date postDate=new Date(datetime*1000);
                 if(DateUtils.addDays(now,-31).getTime()>postDate.getTime()){
-                    //进入文章
+                    //查询该公众号的数据库里文章地址
                     VisitContentUrl = wxpostService.selectContentUrlList(NowBiz);
                     if(VisitContentUrl.size()==0){
                         //该公众号没有文章，直接取下一个
@@ -307,8 +307,8 @@ public class WxController {
             String passTicket = (String) mapUrl.get("pass_ticket");
             String page = "https://mp.weixin.qq.com/mp/profile_ext?" +
                     "action=getmsg&__biz=" + biz +
-                    "&f=json&offset=_offset&OneBizTopicCount=10&is_ok=1&scene=124&uin" +
-                    "=777&key=777&pass_ticket=" + passTicket + "&wxtoken=";
+                    "&f=json&offset=_offset&count=10&is_ok=1&scene=124&uin" +
+                    "=777&key=777&pass_ticket=" + passTicket + "&wxtoken=&appmsg_token=930_5WCtOVy%252FsnHYVofxetstKwlTdS4b8zjshHflDA~~&x5=1&f=json HTTP/1.1";
             if (OffsetException) {
                 page = "OFFSET=" + Offset + "##" + page;
                 OffsetException = false;

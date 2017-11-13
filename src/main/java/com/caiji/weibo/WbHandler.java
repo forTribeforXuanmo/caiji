@@ -212,14 +212,22 @@ public class WbHandler{
     public boolean saveWbToDB(HtmlPage page, Integer id, int pageNo) throws InterruptedException, ParseException {
 
         if (pageNo == 1) {
-            DomText nameDomText = page.getFirstByXPath("/html/body/div[4]/table/tbody/tr/td[2]/div/span[1]/text()[1]");
-            String name = nameDomText.getWholeText();
-            DomText sex_address_dom = page.getFirstByXPath("/html/body/div[4]/table/tbody/tr/td[2]/div/span[1]/text()[2]");
-            String sex_address = sex_address_dom.getWholeText();
+            //DomText nameDomText = page.getFirstByXPath("/html/body/div[4]/table/tbody/tr/td[2]/div/span[1]/text()[1]");
+            HtmlSpan  span0 = page.querySelector(" body > div.u > table > tbody > tr > td:nth-child(2) > div > span:nth-child(1)");
+            //body > div.u > table > tbody > tr > td:nth-child(2) > div > span:nth-child(1)
+            DomText nameDomText= (DomText) span0.getFirstChild();
+            String name = nameDomText.getData();
+            HtmlSpan yiguangzhu = span0.querySelector(".cmt");
+            //最后一个元素
+            DomNode lastChild = span0.getLastChild();
+            //前一个元素为性别地址
+            String sex_address = lastChild.getPreviousSibling().asText();
             LOGGER.info("微博名" + name + " 性别/地址" + sex_address);
-            HtmlElement commentSpan = page.getFirstByXPath("/html/body/div[4]/table/tbody/tr/td[2]/div/span[2]");
-            String comment = commentSpan.asText();
-            String weiboNum = page.querySelector("body > div.u > div > span").asText();
+
+            DomNodeList<DomNode> c=page.querySelectorAll(".ut>.ctt");
+            String comment =  c.get(1).asText();
+
+            String weiboNum = page.querySelector("body > div.u > div >span").asText();
             weiboNum = weiboNum.substring(3, weiboNum.length() - 1);
             String guanZhuNum = page.querySelector("body > div.u > div > a:nth-child(2)").asText();
             guanZhuNum = guanZhuNum.substring(3, guanZhuNum.length() - 1);
@@ -236,6 +244,7 @@ public class WbHandler{
             oldUser.setGuanzhuNum(Integer.parseInt(guanZhuNum));
             oldUser.setFansNum(Integer.parseInt(fansNum));
             oldUser.setUserId(userId);
+            oldUser.setCrawtime(DateFormatUtils.format(new Date(),pattern[0]));
             wbuserService.updateById(oldUser);
         }
 

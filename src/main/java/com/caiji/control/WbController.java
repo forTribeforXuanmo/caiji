@@ -79,7 +79,7 @@ public class WbController {
             msg=wbHandler.saveAllWeiboTopic(client);
         } catch (Exception e) {
             msg=msg+"==发生错误转化异常==="+e;
-
+            LOGGER.error("异常",e);
         }finally {
             client.close();
             return msg;

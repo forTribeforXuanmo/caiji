@@ -42,6 +42,19 @@ public class Wbuser extends Model<Wbuser> {
      */
 	@TableField("CRAWLEVEL")
 	private Integer crawlevel;
+	/**
+	 * 采集时间
+	 */
+	@TableField("CRAW_TIME")
+	private String crawtime;
+
+	public String getCrawtime() {
+		return crawtime;
+	}
+
+	public void setCrawtime(String crawtime) {
+		this.crawtime = crawtime;
+	}
 
 	public String getNewName() {
 		return newName;
